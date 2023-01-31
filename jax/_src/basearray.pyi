@@ -16,7 +16,7 @@ from typing import Any, List, Optional, Sequence, Tuple, Union
 import numpy as np
 
 from jax._src.sharding import Sharding
-from jax._src.array import Shard
+from jax._src.array import ArrayImpl, Shard
 from jax._src.typing import ArrayLike
 
 
@@ -35,6 +35,9 @@ class Array(abc.ABC):
 
   @property
   def addressable_shards(self) -> Sequence[Shard]: ...
+
+  @property
+  def addressable_data(self, index: int) -> ArrayImpl: ...
 
   def __init__(self, shape, dtype=None, buffer=None, offset=0, strides=None,
                order=None):

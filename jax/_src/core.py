@@ -589,6 +589,11 @@ class Tracer(typing.Array):
       f"The 'addressable_shards' attribute is not available on the JAX Tracer object {self}")
 
   @property
+  def addressable_data(self, index: int):
+    raise ConcretizationTypeError(self,
+      f"The 'addressable_data' attribute is not available on the JAX Tracer object {self}")
+
+  @property
   def at(self):
     return self.aval.at.fget(self)
 
