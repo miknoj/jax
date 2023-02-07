@@ -115,14 +115,20 @@ def _get_kvstore_for_gcs(ckpt_path: str):
   path_without_bucket = m.group(2)
   return {'driver': 'gcs', 'bucket': gcs_bucket, 'path': path_without_bucket}
 
-def get_tensorstore_spec(ckpt_path: str):
+
+def get_tensorstore_spec(ckpt_path: str, ocdbt: bool = False):
   spec = {'driver': 'zarr', 'kvstore': {}}
 
   if ckpt_path.startswith('gs://'):
     spec['kvstore'] = _get_kvstore_for_gcs(ckpt_path)
   else:
     spec['kvstore'] = {'driver': 'file', 'path': ckpt_path}
-
+  if ocdbt:
+    spec['kvstore'] = {
+        'driver': 'ocdbt',
+        'base': spec['kvstore'],
+        'path': ckpt_path,
+    }
   return spec
 
 
