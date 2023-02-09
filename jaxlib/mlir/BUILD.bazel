@@ -156,3 +156,17 @@ symlink_inputs(
         "//jaxlib/mlir/_mlir_libs:_stablehlo",
     ],
 )
+
+symlink_inputs(
+    name = "vhlo_dialect",
+    rule = py_library,
+    symlinked_inputs = {"srcs": {"dialects": [
+        "@stablehlo//:vhlo_ops_py_files",
+    ]}},
+    deps = [
+        ":core",
+        ":ir",
+        ":mlir",
+        "//jaxlib/mlir/_mlir_libs:_vhlo",
+    ],
+)

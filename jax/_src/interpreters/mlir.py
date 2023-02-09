@@ -344,6 +344,7 @@ def make_ir_context() -> ir.Context:
   dialects.mhlo.register_mhlo_dialect(context)
   dialects.chlo.register_dialect(context)
   dialects.stablehlo.register_dialect(context)
+  dialects.vhlo.register_dialect(context, load=False)
   return context
 
 

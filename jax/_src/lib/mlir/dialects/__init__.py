@@ -22,6 +22,7 @@ import jaxlib.mlir.dialects.sparse_tensor as sparse_tensor
 
 from jax.lib import xla_client
 import jaxlib.mlir.dialects.stablehlo as stablehlo
+import jaxlib.mlir.dialects.vhlo as vhlo
 
 # Alias that is set up to abstract away the transition from MHLO to StableHLO.
 use_stablehlo = xla_client.mlir_api_version >= 42

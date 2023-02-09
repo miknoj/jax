@@ -155,6 +155,23 @@ py_extension(
     ],
 )
 
+py_extension(
+    name = "_vhlo",
+    srcs = [
+        "@stablehlo//:stablehlo/integrations/python/VhloModule.cpp",
+    ],
+    copts = COPTS,
+    deps = [
+        ":jaxlib_mlir_capi_shared_library",
+        "@llvm-project//mlir:CAPIIRHeaders",
+        "@llvm-project//mlir:MLIRBindingsPythonHeaders",
+        "@local_config_python//:headers",
+        "@pybind11",
+        "@stablehlo//:vhlo_capi_headers",
+    ],
+)
+
+
 cc_library(
     name = "jaxlib_mlir_capi_shared_library",
     srcs = select({
@@ -177,6 +194,7 @@ cc_library(
         "@org_tensorflow//tensorflow/compiler/xla/mlir_hlo:CAPIObjects",
         "@stablehlo//:chlo_capi_objects",
         "@stablehlo//:stablehlo_capi_objects",
+        "@stablehlo//:vhlo_capi_objects",
     ],
 )
 
@@ -207,6 +225,7 @@ windows_cc_shared_mlir_library(
         "mlir",
         "chlo",
         "stablehlo",
+        "vhlo",
     ],
     deps = [":jaxlib_mlir_capi_objects"],
 )

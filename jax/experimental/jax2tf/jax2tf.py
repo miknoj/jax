@@ -611,6 +611,12 @@ def _lower_native_and_run(fun_jax: Callable,
 
   Special care must be taken in presence of shape polymorphism.
   """
+  def to_vhlo(mlir_module, version):
+    mlir_str = mlir.module_to_bytecode(mlir_module)
+    vhlo_str = xla_client._xla.mlir.stablehlo_to_vhlo(mlir_str, version)
+    with mlir_module.context:
+      return mlir.ir.Module.parse(vhlo_str)
+
   # Look for shape polymorphism
   # We now have two implementations for the native lowering. If --jax_dynamic_shapes
   # then we use JAX's in-progress support for native dynamic shapes, and we pass
@@ -649,9 +655,34 @@ def _lower_native_and_run(fun_jax: Callable,
   else:
     fun_jax_lower = fun_jax.lower
   lowered = fun_jax_lower(*arg_specs_jax)._lowering
+
+  def is_candidate_for_vhlo(module):
+    # TODO(gleasonk): Decompose CHLO ops and support MHLO TanOp.
+    # Currently programs with CHLO ops are not supported. We need to convert
+    # CHLO -> MHLO -> StableHLO. Currently the test failing this uses chlo.tan
+    # which can be converted to mhlo.tan, but that op is not supported in
+    # StableHLO yet.
+    def walk_operations(op, cb):
+      for region in op.operation.regions:
+        for block in region:
+          for op in block:
+            walk_operations(op, cb)
+
+    has_chlo = False
+    def scan_for_chlo(op):
+      nonlocal has_chlo
+      if op.operation.name.startswith("chlo."):
+        has_chlo = True
+
+    walk_operations(module, scan_for_chlo)
+    return not has_chlo
+
   if config.jax2tf_use_stablehlo:
     mlir_module = lowered.stablehlo()
     xla_call_module_version = 3
+    if is_candidate_for_vhlo(mlir_module):
+      mlir_module = to_vhlo(mlir_module, "0.4.0")
+      xla_call_module_version = 4
   else:
     mlir_module = lowered.mhlo()
     xla_call_module_version = 1

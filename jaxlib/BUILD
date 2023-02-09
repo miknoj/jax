@@ -55,6 +55,7 @@ py_library(
         "//jaxlib/mlir:pass_manager",
         "//jaxlib/mlir:sparse_tensor_dialect",
         "//jaxlib/mlir:stablehlo_dialect",
+        "//jaxlib/mlir:vhlo_dialect",
     ],
 )
 
