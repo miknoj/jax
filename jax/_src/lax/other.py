@@ -14,6 +14,7 @@
 
 
 from typing import Any, Optional, Sequence, Tuple, Union, cast as type_cast
+import jax
 from jax._src.numpy import lax_numpy as jnp
 from jax._src.util import prod
 from jax._src.lax import lax
@@ -117,8 +118,8 @@ def conv_general_dilated_patches(
 
 
 def conv_general_dilated_local(
-    lhs: jnp.ndarray,
-    rhs: jnp.ndarray,
+    lhs: jax.Array,
+    rhs: jax.Array,
     window_strides: Sequence[int],
     padding: Union[str, Sequence[Tuple[int, int]]],
     filter_shape: Sequence[int],
@@ -126,7 +127,7 @@ def conv_general_dilated_local(
     rhs_dilation: Optional[Sequence[int]] = None,
     dimension_numbers: Optional[convolution.ConvGeneralDilatedDimensionNumbers] = None,
     precision: lax.PrecisionLike = None
-) -> jnp.ndarray:
+) -> jax.Array:
   """General n-dimensional unshared convolution operator with optional dilation.
 
   Also known as locally connected layer, the operation is equivalent to
