@@ -1978,7 +1978,7 @@ mlir.register_lowering(erfc_p, partial(_nary_lower_hlo, chlo.ErfcOp))
 erf_inv_p = standard_unop(_float, 'erf_inv')
 ad.defjvp2(erf_inv_p, lambda g, ans, x: mul(_const(x, np.sqrt(np.pi) / 2.),
                                             mul(g, exp(square(ans)))))
-xla.register_translation(erf_inv_p, standard_translate(erf_inv_p))
+mlir.register_lowering(erf_inv_p, partial(_nary_lower_hlo, chlo.ErfInvOp))
 
 real_p = unop(_complex_basetype, _complex, 'real')
 ad.deflinear2(real_p, lambda t, _: [complex(t, np.zeros((), _dtype(t)))])
@@ -2736,7 +2736,6 @@ def precision_attr(precision: PrecisionType) -> ir.ArrayAttr:
     full_precision = precision
   return ir.ArrayAttr.get(
       [hlo.PrecisionAttr.get(str(p)) for p in full_precision])
-
 
 
 def _dot_general_lower(ctx, lhs, rhs, *, dimension_numbers,
@@ -3846,8 +3845,6 @@ mlir.register_lowering(reduce_max_p, partial(_unary_reduce_lower, mlir.max_hlo,
                                              _get_max_identity))
 
 
-
-
 def _reduce_precision_shape_rule(operand, *, exponent_bits, mantissa_bits):
   exponent_bits = operator.index(exponent_bits)
   mantissa_bits = operator.index(mantissa_bits)
@@ -3870,7 +3867,6 @@ def _reduce_precision_lower(ctx, operand, *, exponent_bits, mantissa_bits):
                                mlir.i32_attr(mantissa_bits)).results
 
 mlir.register_lowering(reduce_precision_p, _reduce_precision_lower)
-
 
 
 _UINT_DTYPES = {
